@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐情书</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 粉红色主题 */
+        .pink-theme .highlight {
+            color: #ff69b4 !important;
+            text-shadow: 0 0 5px rgba(255,105,180,0.5);
+        }
+        .pink-theme #songTitle {
+            color: #ff69b4;
+        }
+    </style>
+</head>
+<body>
+    <!-- 修改欢迎弹窗部分 -->
+<div id="welcomePopup" class="popup">
+    <div class="popup-card">
+        <img src="assets/welcome.jpg" class="popup-image" alt="欢迎">
+        <div class="popup-body">
+            <p class="popup-text">接下来的内容含有大量音频，请问你是否准备好了呢？🦋</p>
+            <div class="popup-buttons">
+                <button id="yesBtn">YES</button>
+                <button id="noBtn">NO</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- NO页面 -->
+    <div id="noPage" class="hidden">
+        <img src="assets/no.jpg" alt="No Response" class="no-image">
+    </div>
+
+    <!-- 主播放器内容 -->
+    <div id="mainContent" class="hidden">
+        <div class="background"></div>
+        <div id="particles-js"></div>
+        <div id="sakuraContainer"></div>
+        <div class="container">
+            <h1 id="songTitle">歌曲加载中...</h1>
+            <div class="player-controls">
+                <button id="playBtn">▶ 播放</button>
+                <button id="nextBtn">⏭ 下一首</button>
+            </div>
+            <div class="lyrics-container">
+                <div id="lyrics"></div>
+            </div>
+            <div class="audio-control">
+                <button id="vocalPlayBtn" class="vocal-btn">▶</button>
+                <input type="range" id="vocalProgress" value="0" class="vocal-progress">
+                <span id="vocalTime" class="vocal-time">00:00 / 00:00</span>
+            </div>
+            <div class="message-box">
+                <div id="message"></div>
+            </div>
+            <div class="letter-box">
+                <div id="staticLetter">  请不用害怕现在遇到的所有看似不真诚的人，因为这些人的出现总会教会你什么，请务必热烈的去感受，感受朋友家人对你的爱意，也感受与不同人相处时的喜怒哀乐。不要害怕不要停留在原地，慢慢往前走，所有对的人会站在你的未来里，而现在遇到的不好的人，只是现在小小金金打怪路上的升级点罢了。
+虽然我总是和你说：不要内耗，要学会主动和对方沟通解决自己的情绪，但我知道这些事情不是一朝一夕的口头说说就能很轻易的让自己变成那样的，现在的金金在情感的道路上，喜欢掉点眼泪，喜欢内耗，是极其正常的事情。不要怕自己不会爱人，不会去筛选，这一段段相遇会为你打造一颗慢慢不会轻易被伤害的心脏，但它会一直跳动，为那个对的人一直跳动。错过一个看似很好的恋人也没有关系，看错一个人也没有关系，什么都没有关系，也请你信任自己，一遍遍的拯救自己于水生火热之中。smh他只是你人生道路中一个小小的点，未来会出现那个，本身就很好也愿意为你付出的男生，那个时候也请让我看到一个像当初那样愿意相信别人相信爱情的金金活蹦乱跳的在我面前笑着和我说：等我结婚了我给你单开一桌菜！ 我会千千万万遍因为你的幸福而感到无比幸福。世界遗落了一颗不谙世事的明珠，海浪的击打，沙粒的摩挲，阳光的倾晒，铸就了那么一颗闪着彩虹纹的明珠。而现在我把你比作这颗明珠，泛着金灿灿的光芒，路过的人也一定会为它现在闪烁出的耀眼光芒而驻足停留吧。
+当然现在的金金是柔软的小女孩，我之前所和你说的和现在想告诉你的永远不是让你去练就一颗刀枪不入的心脏，而使让它长出会呼吸的鳞片，柔软时可以浪漫的盛住银河，坚毅时可以劈开滔天的海浪
+写到这我一直在思考我的文笔是不是过于随意了，但我不希望未来金金记起我的时候是那种肉麻的文邹邹的正经气氛，和你走过的这些年，我们的松散随意，或偶尔正经或偶尔的摩擦，这是我们独一无二的相处方式，我为我们这两颗无比崇尚自由的紧紧相依的心脏，为我们崇高的自由意志高声歌颂，我们的快乐胜过千千万万。
+生日快乐！生日不是庆祝你出生，而是庆祝你的存在，谢谢你的存在，谢谢我们的相遇，而我也祝你，我的朋友，人生永远柳暗花明。
+随信附上整个宇宙的晨露，供你浇灌所有未醒的黎明。纸短情长，余言留给候鸟翅膀慢慢丈量。
+    旦逢良辰，顺颂时宜。
+- [ ] 
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
