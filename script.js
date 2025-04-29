@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('welcomePopup').classList.add('hidden');
         document.getElementById('mainContent').classList.remove('hidden');
         initPlayer();
+        initCommentSystem(); // 移到这里初始化
     });
     
     document.getElementById('noBtn').addEventListener('click', function() {
@@ -57,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function initPlayer() {
     loadSong(currentSongIndex);
     initVocalControl(); // 初始化音频控制
-
     // 按钮事件
     document.getElementById('playBtn').addEventListener('click', togglePlay);
     document.getElementById('nextBtn').addEventListener('click', nextSong);
@@ -268,3 +268,79 @@ const syncScroll = () => {
     document.body.style.overflow = 'auto';
     setTimeout(() => document.body.style.overflow = 'auto', 100);
   });
+// 留言系统初始化
+let comments = JSON.parse(localStorage.getItem('comments')) || [];
+
+function initCommentSystem() {
+    const submitBtn = document.getElementById('submitComment');
+    const input = document.getElementById('commentInput');
+    
+    // 加载已有留言
+    renderComments();
+    
+    // 提交事件
+    submitBtn.addEventListener('click', () => {
+        const content = input.value.trim();
+        if(content) {
+            const newComment = {
+                content: content,
+                time: new Date().toLocaleString('zh-CN', { 
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+            comments.push(newComment);
+            saveComments();
+            renderComments();
+            input.value = '';
+        }
+    });
+    // 新增删除事件监听（使用事件委托）
+    document.getElementById('commentsList').addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+            const item = e.target.closest('.comment-item');
+            const index = parseInt(item.dataset.index);
+            
+            if (confirm('确定要删除这条留言吗？')) {
+                comments.splice(index, 1);
+                saveComments();
+                renderComments();
+            }
+        }
+    });
+}
+
+// 保存到本地存储
+function saveComments() {
+    localStorage.setItem('comments', JSON.stringify(comments));
+}
+
+// 渲染留言列表
+function renderComments() {
+    const container = document.getElementById('commentsList');
+    container.innerHTML = comments.map((comment, index) => `
+        <div class="comment-item" data-index="${index}">
+            <div class="comment-content">
+                ${escapeHtml(comment.content)}
+                <button class="delete-btn">×</button>
+            </div>
+            <div class="comment-time">🕊 ${comment.time}</div>
+        </div>
+    `).join('');
+
+    // 自动滚动到底部
+    container.scrollTop = container.scrollHeight;
+}
+
+// 防止XSS攻击
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
