@@ -25,6 +25,7 @@ html, body {
     background: url('assets/bg.jpg') center/cover no-repeat;
     filter: blur(10px);
     z-index: -2;
+    -webkit-transform: translateZ(0);
 }
 
 /* 粒子背景 */
@@ -525,7 +526,7 @@ html {
     height: 100vh;
     overflow: auto; /* 仅保留一个滚动系统 */
     scrollbar-width: thin; /* Firefox支持 */
-    scrollbar-color: #ff69b4 rgba(255,255,255,0.1); /* 粉色主题滚动条 */
+    scrollbar-color: #8d7581 rgba(255,255,255,0.1); /* 粉色主题滚动条 */
   }
   
   /* Webkit系浏览器滚动条美化 */
@@ -559,6 +560,7 @@ html {
 .message-box {
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px); /* Safari 9+ */
+    isolation: isolate;
   }
   /* 留言板整体样式 */
 .message-board {
@@ -617,7 +619,7 @@ html {
     border-radius: 20px;
     color: white;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: transform 0.1s;
 }
 
 #submitComment:hover {
@@ -756,7 +758,7 @@ html {
   /* 替代方案 */
 ::-webkit-scrollbar {
     width: 8px;
-    background: rgba(255,105,180,0.1);
+    background: rgba(255, 105, 180, 0.032);
   }
   
   /* 隐藏原生滚动条 */
@@ -862,4 +864,22 @@ body {
 .message.error .bubble {
     background: rgba(255,0,0,0.1);
     border: 1px solid rgba(255,0,0,0.3);
+}
+/* 修复iPad Safari滚动条 */
+.lyrics-container::-webkit-scrollbar {
+    width: 8px;
+    background: rgba(255,105,180,0.1);
+}
+
+/* 兼容iPad指针设备 */
+@media (pointer: fine) {
+    button:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s ease;
+    }
+}
+
+/* 修复视频控件叠加问题 */
+video::-webkit-media-controls {
+    z-index: 1000;
 }

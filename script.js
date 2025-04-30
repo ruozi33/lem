@@ -37,7 +37,7 @@ const randomReplies = [
     "⏳ 时光沙漏倒流中...",
     "🍬 糖果罐又空了一颗",
     "📻 正在调频到你的波长",
-    "🌌 银河系漫游指南更新中"
+    "🌌 银河系漫游指南更新中",
 ];
 // 歌曲数据
 const songs = [
@@ -595,5 +595,25 @@ function forceScroll(container) {
     // 最终保障
     requestAnimationFrame(() => {
         container.scrollTop = container.scrollHeight;
+    });
+}
+// iPad专属键盘处理
+setTimeout(() => {
+    const viewport = window.visualViewport;
+    window.scrollTo(0, viewport.pageTop);
+    input.scrollIntoView({ block: 'center' });
+}, 300);
+window.addEventListener('orientationchange', () => {
+    // 强制重新渲染
+});
+window.addEventListener('error', function(e) {
+    if (isiPad) {
+        alert(`操作失败: ${e.message}`);
+    }
+});
+// 在initCommentSystem中添加
+if (isiPad) {
+    input.addEventListener('blur', () => {
+        setTimeout(() => window.scrollTo(0,0), 200);
     });
 }
