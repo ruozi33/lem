@@ -394,24 +394,47 @@ button:hover {
     border-radius: 2px;
     cursor: pointer;
     transition: height 0.3s;
+    min-width: 30%; /* 确保最小可用空间 */
 }
 
 .vocal-progress::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    @media (max-width: 480px) {
+        width: 14px;
+        height: 14px;
+    }
 }
 
 .vocal-time {
-    font-size: 12px;
+    font-size: 0.7rem; /* 使用相对单位 */
     font-family: monospace;
     color: rgba(255,255,255,0.9);
-    min-width: 100px;
+    min-width: 6em; /* 固定最小宽度 */
     text-align: center;
+    white-space: nowrap; /* 防止换行 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 超长显示省略号 */
+    flex-shrink: 0; /* 禁止缩小 */
+    /* 移动端适配 */
+    @media (max-width: 480px) {
+        font-size: 0.6rem;
+        min-width: 5.5em;
+        padding: 0 0.3em;
+    }
+    
+    /* 超小屏适配 */
+    @media (max-width: 320px) {
+        font-size: 0.55rem;
+        min-width: 5em;
+    }
 }
+
+
 
 /* 独立情书框 */
 .letter-box {
@@ -798,4 +821,45 @@ html {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+/* 新增移动端安全区域适配 */
+body {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.comment-input {
+    position: sticky;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(10px);
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: transform 0.3s ease;
+}
+
+/* 键盘弹出时的输入框定位 */
+.keyboard-active .comment-input {
+    transform: translateY(calc(-1 * var(--keyboard-height, 0px)));
+}
+
+/* 移动端歌词容器优化 */
+@media (max-width: 768px) {
+    .lyrics-container {
+        height: 50vh !important;
+        overscroll-behavior: contain;
+    }
+    
+    .container {
+        margin: 20px auto;
+        padding: 20px;
+    }
+}
+/* 临时消息样式 */
+.message.temp .bubble {
+    opacity: 0.8;
+    background: rgba(255,105,180,0.3);
+}
+
+.message.error .bubble {
+    background: rgba(255,0,0,0.1);
+    border: 1px solid rgba(255,0,0,0.3);
 }

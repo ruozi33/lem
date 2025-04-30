@@ -1,3 +1,24 @@
+// 在脚本最前面添加
+let isKeyboardVisible = false;
+
+// 监听虚拟键盘状态
+window.addEventListener('resize', () => {
+    const visual = window.visualViewport;
+    if (!visual) return;
+    
+    // 通过视口高度变化检测键盘
+    const keyboardHeight = window.innerHeight - visual.height;
+    isKeyboardVisible = keyboardHeight > 100;
+    
+    // 添加安全阈值
+    if (isKeyboardVisible) {
+        window.isKeyboardVisible = true;
+        setTimeout(() => window.isKeyboardVisible = true, 500);
+    } else {
+        window.isKeyboardVisible = false;
+    }
+});
+
 let replyIndex = 0;
 const sequentialReplies = [
     "🌸 第一朵樱花飘落时，我在想你",
@@ -293,6 +314,47 @@ const syncScroll = () => {
 function initCommentSystem() {
     const submitBtn = document.getElementById('submitComment');
     const input = document.getElementById('commentInput');
+    let lastScrollPos = 0;
+    let isKeyboardVisible = false;
+
+    // 监听虚拟键盘
+    const viewport = window.visualViewport;
+    viewport.addEventListener('resize', () => {
+        const keyboardHeight = window.innerHeight - viewport.height;
+        if (keyboardHeight > 100) {
+            isKeyboardVisible = true;
+            document.body.classList.add('keyboard-active');
+            document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+            setTimeout(() => {
+                input.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }, 300);
+        } else {
+            isKeyboardVisible = false;
+            document.body.classList.remove('keyboard-active');
+        }
+    });
+    input.addEventListener('focus', () => {
+        lastScrollPos = window.scrollY;
+        // 锁定主容器滚动
+        document.documentElement.style.overflow = 'hidden';
+    });
+
+    input.addEventListener('blur', () => {
+        document.documentElement.style.overflow = '';
+        if (!isKeyboardVisible) {
+            window.scrollTo(0, lastScrollPos);
+        }
+    });
+    const forceScroll = (container) => {
+        const initialScroll = container.scrollTop;
+        container.scrollTop = container.scrollHeight;
+        
+        if (container.scrollTop === initialScroll) {
+            requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+    };
 
     const handleSubmit = () => {
         const content = input.value.trim();
@@ -371,44 +433,139 @@ function saveMessage(msg) {
 }
 
 // ==== 修改renderMessages函数 ====
+// 修改renderMessages函数
 function renderMessages() {
     const container = document.getElementById('commentsList');
-    try {
-        const messages = JSON.parse(localStorage.getItem('messages')) || [];
-        
-        // 生成HTML片段
-        const html = messages.map(msg => `
-            <div class="message ${msg.type}">
-                <div class="bubble">
-                    ${msg.type === 'system' ? '<div class="prefix">嫣嫣ovo</div>' : ''}
-                    <div class="content">${escapeHtml(msg.content)}</div>
-                    <div class="time">${msg.time}</div>
-                </div>
+    if (!container) return;
+
+    // 使用文档片段批量操作DOM
+    const fragment = document.createDocumentFragment();
+    const messages = JSON.parse(localStorage.getItem('messages')) || [];
+    
+    messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `message ${msg.type}`;
+        div.innerHTML = `
+            <div class="bubble">
+                ${msg.type === 'system' ? '<div class="prefix">嫣嫣ovo</div>' : ''}
+                <div class="content">${escapeHtml(msg.content)}</div>
+                <div class="time">${msg.time}</div>
             </div>
-        `).join('');
-        // 使用微任务确保DOM更新
-        Promise.resolve().then(() => {
-            container.innerHTML = html;
-            
-            // 添加双重滚动保障
-            const scroll = () => {
-                container.scrollTop = container.scrollHeight;
-                // 添加容错检查
-                if (container.scrollHeight > container.clientHeight) {
-                    container.scrollTop = container.scrollHeight;
-                }
-            };
-            
-            // 使用不同时机触发
-            requestAnimationFrame(scroll);
-            setTimeout(scroll, 100);
+        `;
+        fragment.appendChild(div);
+    });
+
+    // 同步DOM操作
+    container.innerHTML = '';
+    container.appendChild(fragment);
+
+    // 立即触发滚动
+    const scrollToBottom = () => {
+        const prevScroll = container.scrollTop;
+        container.scrollTop = container.scrollHeight;
+        
+        // 强制同步布局
+        if (container.scrollTop === prevScroll) {
+            container.style.overflowY = 'hidden';
+            container.scrollTop = container.scrollHeight;
+            container.style.overflowY = 'auto';
+        }
+    };
+
+    // 使用双requestAnimationFrame保证执行时机
+    requestAnimationFrame(() => {
+        requestAnimationFrame(scrollToBottom);
+    });
+
+    // 移动端键盘处理（保持原有逻辑）
+    if (window.isKeyboardVisible) {
+        const input = document.getElementById('commentInput');
+        requestAnimationFrame(() => {
+            input.scrollIntoView({ 
+                behavior: 'auto',
+                block: 'nearest',
+                inline: 'start'
+            });
         });
-    } catch (e) {
-        console.error('渲染失败:', e);
     }
-    console.log('容器高度:', container.clientHeight);
-    console.log('滚动高度:', container.scrollHeight);
-    console.log('当前滚动位置:', container.scrollTop);    
+}
+
+// 修改留言提交处理
+async function handleSubmit() {
+    const input = document.getElementById('commentInput');
+    const content = input.value.trim();
+    if (!content) return;
+
+    // 创建临时消息实现即时显示
+    const tempId = Date.now();
+    const tempMsg = {
+        id: tempId,
+        type: 'user',
+        content: content,
+        time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'}),
+        temp: true
+    };
+
+    // 立即更新DOM
+    const container = document.getElementById('commentsList');
+    const div = document.createElement('div');
+    div.className = 'message user temp';
+    div.innerHTML = `
+        <div class="bubble">
+            <div class="content">${escapeHtml(content)}</div>
+            <div class="time">${tempMsg.time}</div>
+        </div>
+    `;
+    container.appendChild(div);
+    
+    // 立即滚动
+    container.scrollTop = container.scrollHeight;
+
+    try {
+        // 异步保存
+        await saveMessage(tempMsg);
+        
+        // 替换临时消息
+        const newMsg = {...tempMsg, temp: false};
+        div.className = 'message user';
+        div.innerHTML = `
+            <div class="bubble">
+                <div class="content">${escapeHtml(newMsg.content)}</div>
+                <div class="time">${newMsg.time}</div>
+            </div>
+        `;
+
+        // 生成回复
+        const reply = await generateReply();
+        await saveMessage(reply);
+        
+        // 直接追加回复（避免重新渲染全部）
+        const replyDiv = document.createElement('div');
+        replyDiv.className = 'message system';
+        replyDiv.innerHTML = `
+            <div class="bubble">
+                <div class="prefix">嫣嫣ovo</div>
+                <div class="content">${escapeHtml(reply.content)}</div>
+                <div class="time">${reply.time}</div>
+            </div>
+        `;
+        container.appendChild(replyDiv);
+
+        // 最终滚动
+        requestAnimationFrame(() => {
+            container.scrollTop = container.scrollHeight;
+            if (window.isKeyboardVisible) {
+                input.focus();
+            }
+        });
+
+    } catch (error) {
+        // 错误处理
+        div.classList.add('error');
+        console.error('提交失败:', error);
+    } finally {
+        input.value = '';
+    }
 }
 
 // 防止XSS攻击
