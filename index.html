@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>音乐情书</title>
     <link rel="stylesheet" href="styles.css">
     <style>
@@ -44,8 +45,14 @@
         <div class="container">
             <h1 id="songTitle">歌曲加载中...</h1>
             <div class="player-controls">
-                <button id="playBtn">▶ 播放</button>
-                <button id="nextBtn">⏭ 下一首</button>
+                <button id="playBtn" aria-label="播放/暂停">
+                    <span aria-hidden="true">▶</span>
+                    <span class="visually-hidden">播放/暂停按钮</span>
+                </button>
+                <button id="nextBtn" aria-label="下一首">
+                    <span aria-hidden="true">⏭</span>
+                    <span class="visually-hidden">下一首按钮</span>
+                </button>
             </div>
             <div class="lyrics-container">
                 <div id="lyrics"></div>
@@ -66,7 +73,7 @@
 生日快乐！生日不是庆祝你出生，而是庆祝你的存在，谢谢你的存在，谢谢我们的相遇，而我也祝你，我的朋友，人生永远柳暗花明。
 随信附上整个宇宙的晨露，供你浇灌所有未醒的黎明。纸短情长，余言留给候鸟翅膀慢慢丈量。
     旦逢良辰，顺颂时宜。
-- [ ] 
+
 
                 </div>
             </div>
@@ -81,8 +88,9 @@
             id="commentInput" 
             placeholder="写下你的祝福..."
             maxlength="200"
+            aria-label="留言输入框"
         ></textarea>
-        <button id="submitComment">放飞祝福</button>
+        <button id="submitComment" title="发送留言">发送</button>
     </div>
 </div>
 

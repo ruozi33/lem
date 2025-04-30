@@ -1,3 +1,23 @@
+let replyIndex = 0;
+const sequentialReplies = [
+    "🌸 第一朵樱花飘落时，我在想你",
+    "💌 第57次取消发送的勇气",
+    "🎶 正在循环你喜欢的歌",
+    "🦋 蝴蝶飞不过沧海又如何",
+    "🌙 月光会记得我们的对话",
+    "📮 信箱里藏着第99封信",
+    "🍃 春风捎来未说出口的话",
+    "💫 星光照亮所有未完成的诗",
+    "🎁 礼物正在派送中...",
+    "🔖 书签停留在第521页"
+];
+
+const randomReplies = [
+    "⏳ 时光沙漏倒流中...",
+    "🍬 糖果罐又空了一颗",
+    "📻 正在调频到你的波长",
+    "🌌 银河系漫游指南更新中"
+];
 // 歌曲数据
 const songs = [
     {
@@ -268,71 +288,127 @@ const syncScroll = () => {
     document.body.style.overflow = 'auto';
     setTimeout(() => document.body.style.overflow = 'auto', 100);
   });
-// 留言系统初始化
-let comments = JSON.parse(localStorage.getItem('comments')) || [];
 
+// ==== 修正后的initCommentSystem函数 ====
 function initCommentSystem() {
     const submitBtn = document.getElementById('submitComment');
     const input = document.getElementById('commentInput');
-    
-    // 加载已有留言
-    renderComments();
-    
-    // 提交事件
-    submitBtn.addEventListener('click', () => {
+
+    const handleSubmit = () => {
         const content = input.value.trim();
-        if(content) {
-            const newComment = {
-                content: content,
-                time: new Date().toLocaleString('zh-CN', { 
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })
-            };
-            comments.push(newComment);
-            saveComments();
-            renderComments();
-            input.value = '';
+        if (!content) return;
+
+        // 保存用户留言
+        const userMsg = {
+            type: 'user',
+            content: content,
+            time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
+        };
+        
+        if (!saveMessage(userMsg)) return;
+
+        // 生成自动回复
+        let replyContent;
+        if (replyIndex < sequentialReplies.length) {
+            replyContent = sequentialReplies[replyIndex];
+            replyIndex++;
+        } else {
+            replyContent = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+        }
+
+        const replyMsg = {
+            type: 'system',
+            content: replyContent,
+            time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
+        };
+
+        // 异步处理自动回复
+        setTimeout(() => {
+            if (!saveMessage(replyMsg)) return;
+            renderMessages(); // 只调用一次渲染
+            input.value = ''; // 清空输入框
+        }, 800);
+    };
+
+    submitBtn.addEventListener('click', handleSubmit);
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
         }
     });
-    // 新增删除事件监听（使用事件委托）
-    document.getElementById('commentsList').addEventListener('click', (e) => {
-        if (e.target.classList.contains('delete-btn')) {
-            const item = e.target.closest('.comment-item');
-            const index = parseInt(item.dataset.index);
-            
-            if (confirm('确定要删除这条留言吗？')) {
-                comments.splice(index, 1);
-                saveComments();
-                renderComments();
-            }
-        }
-    });
+}
+
+// ==== 增强型saveMessage函数 ====
+function saveMessage(msg) {
+    try {
+        const messages = JSON.parse(localStorage.getItem('messages')) || [];
+        messages.push(msg);
+        localStorage.setItem('messages', JSON.stringify(messages));
+        console.log('消息保存成功:', msg); // 调试日志
+        return true;
+    } catch (e) {
+        console.error('本地存储失败:', e);
+        alert('留言保存失败，请检查浏览器存储权限');
+        return false;
+    }
 }
 
 // 保存到本地存储
-function saveComments() {
-    localStorage.setItem('comments', JSON.stringify(comments));
+function saveMessage(msg) {
+    try {
+        const messages = JSON.parse(localStorage.getItem('messages')) || [];
+        console.log('保存前的消息:', messages); // 调试日志
+        messages.push(msg);
+        localStorage.setItem('messages', JSON.stringify(messages));
+        console.log('保存后的消息:', messages); // 调试日志
+        return true;
+    } catch (e) {
+        console.error('存储失败:', e);
+        alert('留言保存失败，请检查浏览器存储设置');
+        return false;
+    }
 }
 
-// 渲染留言列表
-function renderComments() {
+// ==== 修改renderMessages函数 ====
+function renderMessages() {
     const container = document.getElementById('commentsList');
-    container.innerHTML = comments.map((comment, index) => `
-        <div class="comment-item" data-index="${index}">
-            <div class="comment-content">
-                ${escapeHtml(comment.content)}
-                <button class="delete-btn">×</button>
+    try {
+        const messages = JSON.parse(localStorage.getItem('messages')) || [];
+        
+        // 生成HTML片段
+        const html = messages.map(msg => `
+            <div class="message ${msg.type}">
+                <div class="bubble">
+                    ${msg.type === 'system' ? '<div class="prefix">嫣嫣ovo</div>' : ''}
+                    <div class="content">${escapeHtml(msg.content)}</div>
+                    <div class="time">${msg.time}</div>
+                </div>
             </div>
-            <div class="comment-time">🕊 ${comment.time}</div>
-        </div>
-    `).join('');
-
-    // 自动滚动到底部
-    container.scrollTop = container.scrollHeight;
+        `).join('');
+        // 使用微任务确保DOM更新
+        Promise.resolve().then(() => {
+            container.innerHTML = html;
+            
+            // 添加双重滚动保障
+            const scroll = () => {
+                container.scrollTop = container.scrollHeight;
+                // 添加容错检查
+                if (container.scrollHeight > container.clientHeight) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            };
+            
+            // 使用不同时机触发
+            requestAnimationFrame(scroll);
+            setTimeout(scroll, 100);
+        });
+    } catch (e) {
+        console.error('渲染失败:', e);
+    }
+    console.log('容器高度:', container.clientHeight);
+    console.log('滚动高度:', container.scrollHeight);
+    console.log('当前滚动位置:', container.scrollTop);    
 }
 
 // 防止XSS攻击
@@ -343,4 +419,24 @@ function escapeHtml(unsafe) {
          .replace(/>/g, "&gt;")
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
+}
+document.getElementById('commentsList').addEventListener('scroll', () => {
+    console.log('当前滚动位置:', this.scrollTop);
+});
+function forceScroll(container) {
+    const initialScroll = container.scrollTop;
+    container.scrollTop = container.scrollHeight;
+    
+    // 如果滚动未生效，使用备用方案
+    if (container.scrollTop === initialScroll) {
+        container.style.overflowY = 'hidden';
+        container.offsetHeight; // 强制重排
+        container.style.overflowY = 'auto';
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    // 最终保障
+    requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+    });
 }
