@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>音乐情书</title>
     <link rel="stylesheet" href="styles.css">
-    
     <style>
         /* 粉红色主题 */
         .pink-theme .highlight {
@@ -18,98 +15,7 @@
         .pink-theme #songTitle {
             color: #ff69b4;
         }
-    /* 新增iPad专属媒体查询 */
-    @media (min-width: 768px) and (max-width: 1024px) {
-        .container {
-            margin: 50px auto;
-            padding: 40px;
-            border-radius: 30px;
-        }
-
-        .vocal-time {
-            font-size: 0.75rem;
-            min-width: 7em;
-        }
-
-        .lyrics-container {
-            height: 50vh !important;
-        }
-        /* 修复Safari模糊问题 */
-        .background {
-            -webkit-transform: translateZ(0);
-        }
-    }
-
-    /* 兼容iPad Pro 12.9英寸 */
-    @media (min-width: 1024px) and (max-height: 1366px) {
-        .player-controls button {
-            padding: 15px 40px;
-            font-size: 1.1rem;
-        }
-    }
-
-    /* 修复Safari弹性布局问题 */
-    .audio-control {
-        display: -webkit-flex;
-        display: flex;
-        -webkit-align-items: center;
-        align-items: center;
-    }
     </style>
-
-    <script>
-    // 添加iPad检测逻辑
-    const isiPad = /iPad|Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document;
-        
-    // 优化键盘处理
-    function handleKeyboard() {
-        const input = document.getElementById('commentInput');
-            
-        input.addEventListener('focus', () => {
-            if (isiPad) {
-                setTimeout(() => {
-                    const viewport = window.visualViewport;
-                    window.scrollTo(0, viewport.pageTop);
-                    input.scrollIntoView({ block: 'center' });
-                }, 300);
-            }
-        });
-    }
-    // 增强错误捕获
-    window.addEventListener('error', function(e) {
-        console.error('Global Error:', e);
-        if (isiPad) {
-            alert(`操作失败: ${e.message}`);
-        }
-    });
-
-    // 方向切换处理
-    window.addEventListener('orientationchange', () => {
-        if (isiPad) {
-            setTimeout(() => {
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-                forceRerender();
-            }, 300);
-        }
-    });
-    function forceRerender() {
-        const containers = document.querySelectorAll('.container, .lyrics-container');
-        containers.forEach(el => {
-            el.style.display = 'none';
-            el.offsetHeight;
-            el.style.display = 'block';
-        });
-    }
-
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
-    <script>
-        if (isiPad) {
-            FastClick.attach(document.body);
-        }
-    </script>
-    
 </head>
 <body>
     <!-- 修改欢迎弹窗部分 -->
