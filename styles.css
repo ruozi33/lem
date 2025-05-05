@@ -545,11 +545,26 @@ html {
   
   /* 歌词容器优化 */
   .lyrics-container {
-    overflow-y: auto; 
-    max-height: 40vh; /* 控制可视区域 */
-    scroll-behavior: smooth;
-    padding-right: 5px; /* 防止滚动条遮挡文字 */
-  }
+    height: 300px;
+    overflow: hidden !important; /* 强制隐藏滚动条 */
+    position: relative;
+    margin-bottom: 30px;
+    scrollbar-width: none; /* Firefox兼容 */
+}
+
+/* 歌词内容样式 */
+#lyrics {
+    position: absolute;
+    width: 100%;
+    transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+    padding: 40% 0; /* 添加垂直缓冲 */
+    will-change: transform; /* 优化性能 */
+}
+
+/* 隐藏所有浏览器的滚动条 */
+.lyrics-container::-webkit-scrollbar {
+    display: none !important;
+}
   
   /* 当歌词滚动时隐藏主滚动条 */
   .lyrics-container:hover ~ body {
@@ -809,6 +824,9 @@ html {
     height: 320px !important;
     overflow-y: auto !important;
     scroll-behavior: smooth; /* 添加平滑滚动 */
+    display: flex !important;
+    flex-direction: column !important;
+    padding-right: 8px;
 }
 
 .message {
@@ -816,6 +834,8 @@ html {
     min-height: 50px;
     margin: 10px 0;
     animation: fadeIn 0.3s ease-in; /* 添加入场动画 */
+    flex-shrink: 0 !important;
+    min-height: 50px;
 }
 
 @keyframes fadeIn {
@@ -862,4 +882,41 @@ body {
 .message.error .bubble {
     background: rgba(255,0,0,0.1);
     border: 1px solid rgba(255,0,0,0.3);
+}
+/* 修改留言板容器定位 */
+.message-board {
+    position: relative;
+    padding-bottom: 70px; /* 为输入框预留空间 */
+}
+
+/* 固定输入框位置 */
+.comment-input {
+    position: sticky;
+    bottom: -100px; /* 初始隐藏位置 */
+    transition: bottom 0.3s ease;
+    background: rgba(0, 0, 0, 0.034);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    z-index: 100;
+    border-top: 1px solid rgba(255,105,180,0.3);
+}
+
+/* 当滚动到留言区时的输入框状态 */
+.message-board.in-view .comment-input {
+    bottom: 0; /* 完全显示 */
+}
+
+/* 当开始滚动时的输入框状态 */
+.message-board.scrolling-up .comment-input {
+    bottom: -70px; /* 完全隐藏 */
+}
+/* 防止页面跳动 */
+html {
+    scroll-behavior: auto !important;
+}
+
+/* 确保留言容器正确滚动 */
+.comments-container {
+    overscroll-behavior: contain;
+    scroll-snap-type: none !important;
 }

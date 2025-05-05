@@ -1,3 +1,21 @@
+let isScrolling = false;
+function safeScrollToBottom() {
+    if (isScrolling) return;
+    isScrolling = true;
+    
+    scrollToBottom();
+    
+    setTimeout(() => {
+        isScrolling = false;
+    }, 300);
+}
+// 新增调试函数 (完成后可删除)
+function debugScroll(container) {
+    console.log('容器高度:', container.clientHeight);
+    console.log('滚动高度:', container.scrollHeight);
+    console.log('当前滚动位置:', container.scrollTop);
+}
+
 // 在脚本最前面添加
 let isKeyboardVisible = false;
 
@@ -34,38 +52,246 @@ const sequentialReplies = [
 ];
 
 const randomReplies = [
-    "⏳ 时光沙漏倒流中...",
-    "🍬 糖果罐又空了一颗",
-    "📻 正在调频到你的波长",
-    "🌌 银河系漫游指南更新中"
+    "凌晨四点钟，看到海棠花未眠。",
+    "玻璃晴朗，橘子辉煌。",
+    "我偏爱一些荒诞的温柔，比如用月亮煮粥。",
+    "你是我新鲜又明亮的晨露，也是我迟暮时温柔的归宿。",
+    "写信真是一件温柔的事，把细碎的星光装进信封里。",
+    "我们各自乘流而上，互为欢喜人间。",
+    "生活先于意义，正如玫瑰先于诗句。",
+    "你眼里有春与秋，胜过我见过爱过的山川河流。",
+    "想和你虚度时光，比如低头看鱼。把茶杯留在桌子上离开。",
+    "星星醉酒到处跑，月亮跌进深海里，我从未觉得人间美好，直到你来了。",
+    "云朵偷喝了我放在屋顶的酒，于是她脸红变成了晚霞。",
+    "你是我三十九度的风，风一样的梦。",
+    "世间情动，不过盛夏白瓷梅子汤，碎冰碰壁当啷响。",
+    "月光还是少年的月光，九州一色还是李白的霜。",
+    "我贪恋的人间烟火，不偏不倚，全都是你。",
+    "你要做站在云上的那个人，站在太阳和月亮之间。",
+    "想把你养在蓄满星星的池塘里，陪我看月亮坠落。",
+    "你是落日弥漫的橘，天边透亮的星。",
+    "我们把在黑暗中跳舞的心脏叫做月亮。",
+    "你是我半截的诗，不许别人更改一个字。",
+    "山河远阔，人间烟火，无一是你，无一不是你。",
+    "从童年起，我便独自一人，照顾着历代星辰。",
+    "我知这世界，本如露水般短暂。然而，然而。",
+    "我明白你会来，所以我等。",
+    "你笑起来真像好天气。",
+    "今夜我不关心人类，我只想你。",
+    "我们把彼此藏进梦里，连月亮都找不到。",
+    "你眼中有春与秋，胜过我看过的所有诗句。",
+    "你笑起来的时候，我的心里就放起了烟花。",
+    "想把世界上所有的晚安都收集起来，每天对你说一遍。",
+    "你是我所有的不期而遇和久别重逢。",
+    "风经过窗前时总会多停留三秒，大概是在偷听我的心跳。",
+    "把未说出口的晚安折成纸船，任它们在月光河流里漂远。",
+    "凌晨三点的路灯下，我们的影子突然学会了拥抱。",
+    "书签停留在第209页，那行描写晚风的句子像极了你的呼吸。",
+    "樱花坠落的速度是每秒五厘米，而我走向你的速度是每秒心跳两次。",
+    "手机相册里所有模糊的夜景，都因为你的存在突然对焦。",
+    "天气预报说降雨概率30%，但想念你的概率是100%。",
+    "星星睡不着的时候也会数人类吗？",
+    "风停在窗边嘱咐你要热爱这个世界。",
+    "我偷偷把想念写在云上，整个天空都知道了。",
+    "落日溺在云层里，银河滑落一片海。",
+    "我们把彼此藏进梦里，连月亮都找不到。",
+    "输入法记住的名字，比通讯录多一个隐秘的缩写。",
+
 ];
 // 歌曲数据
 const songs = [
     {
-        title: "第57次取消发送",
+        title: "溯",
         file: "assets/music1.mp3",
         background: "assets/bg.jpg",
         color: "#26ee91",
         lyrics: [
-            { time: 0, text: "第57次取消发送-菲菲公主" },
-            { time: 11, text: "好像只能礼貌的问候" },
-            { time: 17, text: "你的温柔也曾被我拥有" },
-            { time: 22, text: "不太习惯没了你的小宇宙" },
-            { time: 28, text: "念旧是上瘾感受" }
+            {
+                time: 0, text: "溯———CORSAK胡梦舟"
+            },
+            {
+                time: 7, text: "总想要透过你眼睛"
+            },
+            {
+                time: 10, text: "去找寻最原始的野性"
+            },
+            {
+                time: 14, text: "没想到最后却闯进"
+            },
+            {
+                time: 17, text: "一整座 森林的宁静"
+            },
+            {
+                time: 21, text: "你呼吸"
+            },
+            {
+                time: 22, text: "蓝丝绒包裹身体"
+            },
+            {
+                time: 25, text: "和海洋的哼鸣"
+            },
+            {
+                time: 28, text: "我永远不愿醒"
+            },
+            {
+                time: 32, text: "我可以"
+            },
+            {
+                time: 33, text: "躲进你的身体"
+            },
+            {
+                time: 39, text: "进入温暖的你"
+            },
+            {
+                time: 46, text: "躲进你的身体"
+            },
+            {
+                time: 74, text: "进入温暖的你"
+            },
+            {
+                time: 76, text: "总想要透过你眼睛"
+            },
+            {
+                time: 78, text: "去找寻水仙的倒影"
+            },
+            {
+                time: 83, text: "没想到最后却目睹"
+            },
+            {
+                time: 85, text: "一整个 宇宙的繁星"
+            },
+            {
+                time: 89, text: "这一秒"
+            },
+            {
+                time: 90, text: "只想在爱里沉溺"
+            },
+            {
+                time: 94, text: "这世界是块冰"
+            },
+            {
+                time: 97, text: "就让她是块冰"
+            },
+            {
+                time: 100, text: "我可以"
+            },
+            {
+                time: 101, text: "躲进你的身体"
+            },
+            {
+                time: 108, text: "进入温暖的你"
+            },
+            {
+                time: 115, text: "躲进你的身体"
+            },
+            {
+                time: 142, text: "躲进你的身体"
+            },
+            {
+                time: 149, text: "进入温暖的你"
+            },
+            {
+                time: 156, text: "躲进你的身体"
+            },
+            {
+                time: 183, text: "进入温暖的你"
+            }
         ],
         message: "浪漫主义都是暗处迎盛阳的玫瑰🦋🌸"
     },
     {
-        title: "第二首歌曲",
+        title: "April Encounter",
         file: "assets/music2.mp3",
         background: "assets/bg2.jpg",
         color: "#ff69b4",
         lyrics: [
-            { time: 0, text: "第二首歌名-歌手名" },
-            { time: 10, text: "第二首歌歌词第一句" },
-            { time: 15, text: "第二首歌歌词第二句" }
+            { time: 0, text: "April Encounter——很美味" },
+            {
+                time: 17, text: "第一次见你的我（好慌张）"
+            },
+            {
+                time: 23, text: "找不到什么话要讲"
+            },
+            {
+                time: 30, text: "你走近我 伸出你的手掌"
+            },
+            {
+                time: 37, text: "(紧握着)我的手没有放"
+            },
+            {
+                time: 43, text: "习惯每天都有你 （在身旁）"
+            },
+            {
+                time: 50, text: "照顾我细腻的模样"
+            },
+            {
+                time: 57, text: "这场电影 有着浪漫的开场 （我好想）"
+            },
+            {
+                time: 63, text: "陪你看到天亮"
+            },
+            {
+                time: 69, text: "想在一个美好的晚上"
+            },
+            {
+                time: 76, text: "写这一首歌来给你唱"
+            },
+            {
+                time: 83, text: "想要对你讲"
+            },
+            {
+                time: 85, text: "你爱我的每个模样"
+            },
+            {
+                time: 89, text: "融化成最甜蜜的糖"
+            },
+            {
+                time: 121, text: "想在一个美好的晚上"
+            },
+            {
+                time: 128, text: "写这一首歌来给你唱"
+            },
+            {
+                time: 134, text: "想要对你讲"
+            },
+            {
+                time: 137, text: "你爱我的每个模样"
+            },
+            {
+                time: 141, text: "融化成最甜蜜的糖"
+            },
+            {
+                time: 148, text: "我曾有过许多幻想"
+            },
+            {
+                time: 151, text: "那些有你的时光"
+            },
+            {
+                time: 154, text: "等到烟花绽放的那天"
+            },
+            {
+                time: 162, text: "你在我身旁"
+            },
+            {
+                time: 164, text: "想在一个美好的晚上"
+            },
+            {
+                time: 170, text: "写这一首歌来给你唱"
+            },
+            {
+                time: 177, text: "想要对你讲"
+            },
+            {
+                time: 180, text: "你爱我的每个模样"
+            },
+            {
+                time: 184, text: "融化成最甜蜜的糖"
+            },
+            {
+                time: 190, text: "你就是最甜蜜的糖"
+            }
         ],
-        message: "这是我们的第二首情歌💕"
+        message: "我喜欢你 ♥"
     }
 ];
 
@@ -129,24 +355,45 @@ function loadSong(index) {
         isPlaying = false;
         document.getElementById('playBtn').textContent = '▶ 播放';
     });
+    // 新增初始化位置
+    requestAnimationFrame(() => {
+        document.getElementById('lyrics').style.transform = 'translateY(0)';
+        setTimeout(updateLyrics, 100);
+    });
 }
 
 // 更新歌词高亮
 function updateLyrics() {
     const currentTime = audio.currentTime;
     const lyrics = songs[currentSongIndex].lyrics;
-    let activeIndex = 0;
+    let activeIndex = -1;
     
-    for (let i = 0; i < lyrics.length; i++) {
+    // 查找当前歌词索引
+    for (let i = lyrics.length - 1; i >= 0; i--) {
         if (currentTime >= lyrics[i].time) {
             activeIndex = i;
+            break;
         }
     }
-    
+
     const lyricsElements = document.querySelectorAll('#lyrics div');
+    const container = document.querySelector('.lyrics-container');
+    // 更新高亮状态
     lyricsElements.forEach((div, index) => {
         div.className = index === activeIndex ? 'highlight' : '';
     });
+    // 自动滚动逻辑
+    if (activeIndex >= 0 && lyricsElements[activeIndex]) {
+        const element = lyricsElements[activeIndex];
+        const containerHeight = container.clientHeight;
+        const elementOffset = element.offsetTop;
+        const elementHeight = element.clientHeight;
+     // 计算居中位置
+     const targetScroll = elementOffset - (containerHeight / 2) + (elementHeight / 2);
+        
+     // 使用transform实现滚动
+     document.getElementById('lyrics').style.transform = `translateY(-${targetScroll}px)`;
+ }   
 }
 
 // 播放/暂停
@@ -294,15 +541,6 @@ document.addEventListener('visibilitychange', () => {
     sakuraInterval = startSakura();
   }
 });
-// 歌词与主滚动同步
-const syncScroll = () => {
-    const lyricsDiv = document.getElementById('lyrics');
-    const scrollPercent = lyricsDiv.scrollTop / (lyricsDiv.scrollHeight - lyricsDiv.clientHeight);
-    window.scrollTo(0, scrollPercent * document.body.scrollHeight);
-  };
-  
-  // 监听歌词滚动
-  document.getElementById('lyrics').addEventListener('scroll', syncScroll);
   
   // 窗口尺寸调整时重置
   window.addEventListener('resize', () => {
@@ -488,6 +726,10 @@ function renderMessages() {
             });
         });
     }
+    requestAnimationFrame(() => {
+        scrollToBottom();
+        setTimeout(scrollToBottom, 300);
+    });
 }
 
 // 修改留言提交处理
@@ -517,55 +759,42 @@ async function handleSubmit() {
         </div>
     `;
     container.appendChild(div);
+    scrollToBottom(); // 立即滚动
+    setTimeout(scrollToBottom, 100); // 等待DOM更新
+    setTimeout(scrollToBottom, 500); // 等待可能的数据加载
+}
+
+// 终极版滚动函数
+function scrollToBottom() {
+    const container = document.getElementById('commentsList');
+    if (!container) return;
     
-    // 立即滚动
+    // 方法1：直接滚动
     container.scrollTop = container.scrollHeight;
-
-    try {
-        // 异步保存
-        await saveMessage(tempMsg);
-        
-        // 替换临时消息
-        const newMsg = {...tempMsg, temp: false};
-        div.className = 'message user';
-        div.innerHTML = `
-            <div class="bubble">
-                <div class="content">${escapeHtml(newMsg.content)}</div>
-                <div class="time">${newMsg.time}</div>
-            </div>
-        `;
-
-        // 生成回复
-        const reply = await generateReply();
-        await saveMessage(reply);
-        
-        // 直接追加回复（避免重新渲染全部）
-        const replyDiv = document.createElement('div');
-        replyDiv.className = 'message system';
-        replyDiv.innerHTML = `
-            <div class="bubble">
-                <div class="prefix">嫣嫣ovo</div>
-                <div class="content">${escapeHtml(reply.content)}</div>
-                <div class="time">${reply.time}</div>
-            </div>
-        `;
-        container.appendChild(replyDiv);
-
-        // 最终滚动
-        requestAnimationFrame(() => {
-            container.scrollTop = container.scrollHeight;
-            if (window.isKeyboardVisible) {
-                input.focus();
-            }
+    
+    // 方法2：使用scrollTo（带容错）
+    setTimeout(() => {
+        container.scrollTo({
+            top: container.scrollHeight + 50, // 额外增加50px
+            behavior: 'smooth'
         });
-
-    } catch (error) {
-        // 错误处理
-        div.classList.add('error');
-        console.error('提交失败:', error);
-    } finally {
-        input.value = '';
-    }
+        
+        // 方法3：锚点兜底
+        const lastChild = container.lastElementChild;
+        if (lastChild) {
+            lastChild.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end'
+            });
+        }
+        
+        // 调试输出
+        console.log('执行滚动时：', {
+            容器高度: container.clientHeight,
+            内容高度: container.scrollHeight,
+            滚动位置: container.scrollTop
+        });
+    }, 10);
 }
 
 // 防止XSS攻击
@@ -597,3 +826,33 @@ function forceScroll(container) {
         container.scrollTop = container.scrollHeight;
     });
 }
+// +++ 新增窗口resize监听 ↓↓↓
+window.addEventListener('resize', () => {
+    scrollToBottom(document.getElementById('commentsList'));
+});
+// 添加滚动监听
+let lastScrollTop = 0;
+const messageBoard = document.querySelector('.message-board');
+
+window.addEventListener('scroll', function() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const boardRect = messageBoard.getBoundingClientRect();
+    
+    // 检测是否滚动到留言区
+    if (boardRect.top < window.innerHeight && boardRect.bottom > 0) {
+        messageBoard.classList.add('in-view');
+        
+        // 检测滚动方向
+        if (scrollTop > lastScrollTop) {
+            // 向下滚动 - 显示输入框
+            messageBoard.classList.remove('scrolling-up');
+        } else {
+            // 向上滚动 - 隐藏输入框
+            messageBoard.classList.add('scrolling-up');
+        }
+    } else {
+        messageBoard.classList.remove('in-view');
+    }
+    
+    lastScrollTop = scrollTop;
+}, {passive: true});
