@@ -353,13 +353,22 @@ function loadSong(index) {
     audio.addEventListener('timeupdate', updateLyrics);
     audio.addEventListener('ended', function() {
         isPlaying = false;
-        document.getElementById('playBtn').textContent = '▶ 播放';
+        document.getElementById('playBtn').textContent = '▶ ';
     });
+    
     // 新增初始化位置
     requestAnimationFrame(() => {
         document.getElementById('lyrics').style.transform = 'translateY(0)';
         setTimeout(updateLyrics, 100);
     });
+    // 添加新的ended事件处理
+    audio.addEventListener('ended', handleSongEnd);
+}
+
+function handleSongEnd() {
+    isPlaying = false; // 保持此处状态重置
+    document.getElementById('playBtn').textContent = '▶ ';
+    nextSong(); // 自动播放下一首
 }
 
 // 更新歌词高亮
@@ -400,21 +409,25 @@ function updateLyrics() {
 function togglePlay() {
     if (isPlaying) {
         audio.pause();
-        document.getElementById('playBtn').textContent = '▶ 播放';
+        document.getElementById('playBtn').textContent = '▶ ';
     } else {
         audio.play();
-        document.getElementById('playBtn').textContent = '⏸ 暂停';
+        document.getElementById('playBtn').textContent = '⏸ ';
     }
     isPlaying = !isPlaying;
 }
 
-// 下一首
+// 修改nextSong函数确保正确播放
 function nextSong() {
     currentSongIndex = (currentSongIndex + 1) % songs.length;
     loadSong(currentSongIndex);
-    if (isPlaying) {
+    
+    // 强制播放新歌曲（无论之前状态）
+    setTimeout(() => {
         audio.play();
-    }
+        isPlaying = true;
+        document.getElementById('playBtn').textContent = '⏸ ';
+    }, 500);
 }
 
 // 打字机效果
@@ -440,6 +453,55 @@ let isVocalPlaying = false;
 function initVocalControl() {
     const progress = document.getElementById('vocalProgress');
     const timeDisplay = document.getElementById('vocalTime');
+    const FADE_DURATION = 2000;
+    const FADE_STEPS = 50;
+    const TARGET_VOLUME = 0.45;   // 音量降低到30%
+
+    let originalVolume = 1;      // 保存原始音量
+    let currentFade = null;      // 用于控制当前渐变
+
+    // 统一音量控制函数
+    const fadeVolume = (targetVol) => {
+        if(currentFade) clearInterval(currentFade);
+        
+        const startVol = audio.volume;
+        const volDiff = targetVol - startVol;
+        let step = 0;
+
+        currentFade = setInterval(() => {
+            if(step <= FADE_STEPS) {
+                audio.volume = startVol + volDiff * (step/FADE_STEPS);
+                step++;
+            } else {
+                clearInterval(currentFade);
+                currentFade = null;
+            }
+        }, FADE_DURATION/FADE_STEPS);
+    };
+
+    vocalAudio.addEventListener('play', () => {
+        originalVolume = audio.volume;
+        fadeVolume(TARGET_VOLUME); // 降低到30%音量
+        console.log('开始vocal播放，背景音量降至', TARGET_VOLUME);
+    });
+
+    vocalAudio.addEventListener('pause', () => {
+        fadeVolume(originalVolume); // 恢复原始音量
+        console.log('暂停vocal，背景音量恢复至', originalVolume);
+    });
+
+    vocalAudio.addEventListener('ended', () => {
+        fadeVolume(originalVolume); // 恢复原始音量
+        console.log('vocal播放结束，背景音量恢复');
+    });
+
+
+
+    // 保持原有的元数据加载逻辑
+    vocalAudio.addEventListener('loadedmetadata', () => {
+        progress.max = vocalAudio.duration;
+        timeDisplay.textContent = `00:00 / ${formatTime(vocalAudio.duration)}`;
+    });
 
     // 元数据加载
     vocalAudio.addEventListener('loadedmetadata', () => {

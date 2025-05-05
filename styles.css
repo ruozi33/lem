@@ -920,3 +920,13 @@ html {
     overscroll-behavior: contain;
     scroll-snap-type: none !important;
 }
+/* 添加可视化过渡提示 */
+.player-controls::after {
+    content: '';
+    position: absolute;
+    width: calc(100% * var(--volume, 1));
+    height: 2px;
+    background: #ff69b4;
+    bottom: -5px;
+    transition: width 0.5s linear;
+}
