@@ -294,7 +294,11 @@ const songs = [
         message: "我喜欢你 ♥"
     }
 ];
-
+// ====== 修正1：全局音频控制变量 ======
+let audioContext;
+let backgroundGain;
+let currentRamp = null;
+const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
 let currentSongIndex = 0;
 let audio = new Audio();
 let isPlaying = false;
@@ -416,18 +420,147 @@ function togglePlay() {
     }
     isPlaying = !isPlaying;
 }
-
-// 修改nextSong函数确保正确播放
 function nextSong() {
+    // 停止当前渐变
+    if (backgroundGain) {
+        backgroundGain.gain.cancelScheduledValues(audioContext.currentTime);
+    }
+    
+    // 清理旧音频
+    audio.pause();
+    
     currentSongIndex = (currentSongIndex + 1) % songs.length;
     loadSong(currentSongIndex);
-    
+
+    // 移动端播放处理
+    const playAfterLoad = () => {
+        audio.play().catch(error => {
+            console.log('自动播放被阻止，等待用户交互');
+            document.getElementById('playBtn').style.display = 'block';
+        });
+    };
+
+    // 确保资源加载
+    if (isMobile) {
+        audio.addEventListener('canplaythrough', playAfterLoad, { once: true });
+    } else {
+        setTimeout(playAfterLoad, 500);
+    }
+
     // 强制播放新歌曲（无论之前状态）
     setTimeout(() => {
         audio.play();
         isPlaying = true;
         document.getElementById('playBtn').textContent = '⏸ ';
     }, 500);
+}
+
+function initWebAudio() {
+    if (audioContext) return;
+
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        backgroundGain = audioContext.createGain();
+        
+        const source = audioContext.createMediaElementSource(audio);
+        source.connect(backgroundGain);
+        backgroundGain.connect(audioContext.destination);
+
+        // iOS自动恢复逻辑
+        const resumeHandler = () => {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    console.log('AudioContext resumed');
+                });
+            }
+        };
+        
+        document.addEventListener('touchstart', resumeHandler, { once: true });
+        document.addEventListener('click', resumeHandler, { once: true });
+        
+    } catch (error) {
+        console.error('Web Audio初始化失败:', error);
+        // 降级方案：使用普通音量控制
+        audio.volume = 1;
+        audio.disableWebAudio = true;
+    }
+}
+
+function smoothFade(targetVolume, duration=1200) {
+    if (audio.disableWebAudio) {
+        audio.volume = targetVolume;
+        return;
+    }
+
+    if (!audioContext || !backgroundGain) {
+        console.warn('音频系统未初始化');
+        return;
+    }
+
+    try {
+        const now = audioContext.currentTime;
+        const currentVol = backgroundGain.gain.value;
+        
+        backgroundGain.gain.cancelScheduledValues(now);
+        backgroundGain.gain.setValueAtTime(currentVol, now);
+        
+        // 使用指数渐变实现自然过渡
+        backgroundGain.gain.exponentialRampToValueAtTime(
+            Math.max(targetVolume, 0.001), // 指数渐变不能为0
+            now + (duration / 1000)
+        );
+        
+        currentRamp = { 
+            start: now, 
+            duration: duration,
+            target: targetVolume 
+        };
+    } catch (error) {
+        console.error('音量渐变失败:', error);
+    }
+}
+
+// ====== 修正4：移动端预加载优化 ======
+function preloadForMobile() {
+    if (!isMobile) return;
+
+    // iOS必须完全静音预加载
+    audio.muted = true;
+    vocalAudio.muted = true;
+
+    const preload = (media) => {
+        media.play().then(() => {
+            media.pause();
+            media.muted = false;
+        }).catch(error => {
+            console.log('预加载静音播放失败（正常现象）:', error);
+        });
+    };
+
+    preload(audio);
+    preload(vocalAudio);
+}
+
+function togglePlay() {
+    if (isPlaying) {
+        audio.pause();
+    } else {
+        // 移动端需要用户交互
+        audio.play().catch(error => {
+            if (isMobile) {
+                alert('请先点击页面任意位置激活音频');
+                document.body.addEventListener('click', () => {
+                    audio.play();
+                }, { once: true });
+            }
+        });
+    }
+    isPlaying = !isPlaying;
+    updatePlayButton();
+}
+
+function updatePlayButton() {
+    document.getElementById('playBtn').textContent = isPlaying ? '⏸ ' : '▶ ';
 }
 
 // 打字机效果
@@ -455,8 +588,32 @@ function initVocalControl() {
     const timeDisplay = document.getElementById('vocalTime');
     const FADE_DURATION = 2000;
     const FADE_STEPS = 50;
-    const TARGET_VOLUME = 0.45;   // 音量降低到30%
+    const TARGET_VOLUME = 0.50;   // 音量降低到30%
 
+    // 移动端首次触摸初始化
+    let isFirstInteraction = true;
+    const initOnInteraction = () => {
+        if (isFirstInteraction) {
+            initWebAudio();
+            preloadForMobile();
+            isFirstInteraction = false;
+        }
+    };
+
+    // 统一事件监听
+    vocalAudio.addEventListener('play', () => {
+        initOnInteraction();
+        smoothFade(0.3, 800); // 快速淡出背景音乐
+    });
+
+    vocalAudio.addEventListener('pause', () => {
+        smoothFade(1.0, 1200); // 慢速恢复背景音乐
+    });
+
+    vocalAudio.addEventListener('ended', () => {
+        smoothFade(1.0, 1000); // 正常速度恢复
+    });
+    
     let originalVolume = 1;      // 保存原始音量
     let currentFade = null;      // 用于控制当前渐变
 

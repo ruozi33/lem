@@ -930,3 +930,14 @@ html {
     bottom: -5px;
     transition: width 0.5s linear;
 }
+/* 优化音量渐变体验 */
+.volume-indicator {
+    transition: opacity 0.3s ease;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    padding: 8px 12px;
+    border-radius: 16px;
+    color: white;
+}
