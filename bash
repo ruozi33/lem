@@ -1,1 +1,0 @@
-ffmpeg -i input.mp3 -b:a 96k -vn output.mp3
